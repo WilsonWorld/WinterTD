@@ -56,6 +56,7 @@ public class LevelManager : MonoBehaviour
         for (int i = 0; i < rewardAmount; i++) {
             reward += Random.Range(1, 5);
         }
+
         m_Player.m_MoneyCounter += reward;
         UpdateMoneyCounter();
         PrepareNextWave();

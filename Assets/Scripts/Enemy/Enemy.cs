@@ -23,7 +23,7 @@ public class Enemy : MonoBehaviour
         NavAgent = GetComponent<NavMeshAgent>();
         m_CurrentWaypointIndex = 0;
 
-        m_MaxHealth = m_StartingHealth + m_LevelManager.WaveNum;
+        m_MaxHealth = m_StartingHealth * m_LevelManager.WaveNum;
         m_CurrentHealth = m_MaxHealth;
 
         if (NavAgent && Waypoints[0] != null) {

@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Player : MonoBehaviour
@@ -12,18 +14,20 @@ public class Player : MonoBehaviour
 
     // Player variables
     [Header("Player")]
+    [SerializeField] ParticleSystem m_BuildEffect;
     public int m_MoneyCounter = 10;
     public int m_LifeCounter = 1;
 
     LevelManager m_LevelManager;
-    GridManager m_GridManger;
     GameObject m_TowerToBuild = null;
     bool m_IsReadyToBuild = false;
 
     private void Awake()
     {
         m_LevelManager = GameObject.Find("LevelManager").GetComponent<LevelManager>();
-        m_GridManger = GameObject.Find("GridManager").GetComponent<GridManager>();
+
+        if (m_BuildEffect)
+            m_BuildEffect.gameObject.SetActive(false);
     }
 
     void Update()
@@ -46,7 +50,11 @@ public class Player : MonoBehaviour
                 }
 
                 if (spawnPos != Vector3.zero && hit.collider.GetComponent<Tile>().IsBuildable == true) {
-                    SpawnTower(spawnPos, Quaternion.identity, hit.collider.GetComponent<Tile>());
+                    m_MoneyCounter -= m_TowerToBuild.GetComponent<Tower>().BuildCost;
+                    m_LevelManager.UpdateMoneyCounter();
+                    StartCoroutine(BuildTowerTimer(spawnPos, m_TowerToBuild));
+                    m_BuildEffect.gameObject.SetActive(true);
+                    m_BuildEffect.gameObject.transform.position = spawnPos + new Vector3(0.0f, 2.5f, 0.0f);
                     hit.collider.GetComponent<Tile>().IsBuildable = false;
                     hit.collider.GetComponent<Tile>().IsWalkable = false;
                 }
@@ -98,19 +106,17 @@ public class Player : MonoBehaviour
     }
 
     // Deduct the cost of the tower from the player, and spawn the selected tower at desired position and rotation
-    void SpawnTower(Vector3 spawnPos, Quaternion spawnRot, Tile spawnTile)
+    void SpawnTower(Vector3 spawnPos, GameObject towerPrefab)
     {
-        if (m_TowerToBuild == null)
-            return;
+        Instantiate(towerPrefab, spawnPos, Quaternion.identity);
+    }
 
-        if (m_MoneyCounter >= m_TowerToBuild.GetComponent<Tower>().BuildCost) {
-            m_MoneyCounter -= m_TowerToBuild.GetComponent<Tower>().BuildCost;
-            m_LevelManager.UpdateMoneyCounter();
+    IEnumerator BuildTowerTimer(Vector3 spawnPos, GameObject towerPrefab)
+    {
+        yield return new WaitForSeconds((float)m_TowerToBuild.GetComponent<Tower>().BuildTime);
 
-            var newTower = Instantiate(m_TowerToBuild, spawnPos, spawnRot);
-            //newTower.transform.SetParent(spawnTile.transform);
-            
-        }
+        m_BuildEffect.gameObject.SetActive(false);
+        SpawnTower(spawnPos, towerPrefab);
     }
 
     public void SetTowerToBuild(GameObject towerPrefab)

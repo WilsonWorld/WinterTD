@@ -4,18 +4,19 @@ using UnityEngine;
 
 public class Tower : MonoBehaviour
 {
-    [SerializeField] ParticleSystem m_ProjectileBlastPrefab;
-    [SerializeField] float m_Cooldown = 5.0f;
-    [SerializeField] float m_Range = 60.0f;
-    [SerializeField] int m_DamageMin = 1;
-    [SerializeField] int m_DamageMax = 3;
-    [SerializeField] int m_BuildCost = 5;
+    [SerializeField] protected ParticleSystem m_ProjectileBlastPrefab;
+    [SerializeField] protected float m_Cooldown = 5.0f;
+    [SerializeField] protected float m_Range = 60.0f;
+    [SerializeField] protected int m_DamageMin = 1;
+    [SerializeField] protected int m_DamageMax = 3;
+    [SerializeField] protected int m_BuildCost = 5;
+    [SerializeField] protected int m_BuildTime = 5;
 
-    GameObject m_AttackTarget;
-    GameObject m_MainTower;
-    Transform m_MuzzlePoint;
-    Quaternion m_OriginalFacing;
-    bool m_CanShoot = true;
+    protected GameObject m_AttackTarget;
+    protected GameObject m_MainTower;
+    protected Transform m_MuzzlePoint;
+    protected Quaternion m_OriginalFacing;
+    protected bool m_CanShoot = true;
 
 
     void Start()
@@ -59,7 +60,7 @@ public class Tower : MonoBehaviour
     }
 
     // Check for other colliders with a spherical radius, checking for the closest enemy to set as a target
-    void FindNearestTarget()
+    protected void FindNearestTarget()
     {
         Collider[] hitColliders = Physics.OverlapSphere(transform.position, m_Range);
         GameObject nearestObject = null;
@@ -79,7 +80,7 @@ public class Tower : MonoBehaviour
     }
 
     // Uses the tower's attack and attack effects, futher shooting is prevented until the cooldown timer is finsihed.
-    void AttackNearestTarget()
+    protected virtual void AttackNearestTarget()
     {
         if (m_CanShoot == true) {
             m_CanShoot = false;
@@ -90,7 +91,7 @@ public class Tower : MonoBehaviour
     }
 
     // Fires off a raycast from the muzzle point forward. If it hits an enemy, random amount of damage between the max and min will be calculated and applied to the enemy if their health is greater than 0.
-    void SpawnRaycast()
+    protected void SpawnRaycast()
     {
         RaycastHit hit;
         Vector3 direction = (m_MuzzlePoint.transform.position + m_MuzzlePoint.transform.forward) - m_MuzzlePoint.transform.position;
@@ -107,14 +108,14 @@ public class Tower : MonoBehaviour
         }
     }
 
-    int GenerateRandomDamange(int min, int max)
+    protected int GenerateRandomDamange(int min, int max)
     {
         int randomDamage = Random.Range(min, max + 1);
         return randomDamage;
     }
 
     // Wait the cooldown duration before letting towers fire again.
-    IEnumerator CooldownTimer()
+    protected IEnumerator CooldownTimer()
     {
         yield return new WaitForSeconds(m_Cooldown);
         m_CanShoot = true;
@@ -138,5 +139,11 @@ public class Tower : MonoBehaviour
     {
         get { return m_BuildCost; }
         set { m_BuildCost = value; }
+    }
+
+    public int BuildTime
+    {
+        get { return m_BuildTime; }
+        set { m_BuildTime = value; }
     }
 }
