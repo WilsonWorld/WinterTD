@@ -5,6 +5,7 @@ using UnityEngine;
 public class Tower : MonoBehaviour
 {
     [SerializeField] protected ParticleSystem m_ProjectileBlastPrefab;
+    [SerializeField] protected ParticleSystem m_BuildEffect;
     [SerializeField] protected float m_Cooldown = 5.0f;
     [SerializeField] protected float m_Range = 60.0f;
     [SerializeField] protected int m_DamageMin = 1;
@@ -15,23 +16,36 @@ public class Tower : MonoBehaviour
     protected GameObject m_AttackTarget;
     protected GameObject m_MainTower;
     protected Transform m_MuzzlePoint;
-    protected Quaternion m_OriginalFacing;
     protected bool m_CanShoot = true;
+
+    Quaternion targetRotation = Quaternion.identity;
+    float turretRotSpeed = 90.0f;
 
 
     void Start()
     {
         m_MainTower = transform.GetChild(0).gameObject;
         m_MuzzlePoint = transform.GetChild(0).GetChild(0).GetChild(0);
-        m_OriginalFacing = m_MainTower.transform.rotation;
+        m_BuildEffect = transform.GetChild(2).GetComponent<ParticleSystem>();
+
+        // Start with the turret deactivated, until the tower has been built
+        m_MainTower.gameObject.SetActive(false);
+
+        // Starts building the tower once created.
+        StartCoroutine(BuildTowerTimer());
     }
 
 
     void Update()
     {
+        if (m_MainTower == null)
+            return;
+
         // Face Towards the target if there is one
         if (m_AttackTarget != null) {
-            m_MainTower.transform.LookAt(m_AttackTarget.transform.position);
+            Vector3 targetDir = (m_AttackTarget.transform.position - m_MainTower.transform.position).normalized;
+            targetRotation = Quaternion.LookRotation(targetDir);
+            m_MainTower.transform.rotation = Quaternion.RotateTowards(m_MainTower.transform.rotation, targetRotation, turretRotSpeed * Time.deltaTime);
             AttackNearestTarget();
         }
     }
@@ -45,7 +59,6 @@ public class Tower : MonoBehaviour
             return;
 
         FindNearestTarget();
-        m_MainTower.transform.rotation = m_OriginalFacing;
     }
 
     // If enemies go out of attack range, switch to the next closest enemy to attack
@@ -91,7 +104,7 @@ public class Tower : MonoBehaviour
     }
 
     // Fires off a raycast from the muzzle point forward. If it hits an enemy, random amount of damage between the max and min will be calculated and applied to the enemy if their health is greater than 0.
-    protected void SpawnRaycast()
+    protected virtual void SpawnRaycast()
     {
         RaycastHit hit;
         Vector3 direction = (m_MuzzlePoint.transform.position + m_MuzzlePoint.transform.forward) - m_MuzzlePoint.transform.position;
@@ -121,11 +134,18 @@ public class Tower : MonoBehaviour
         m_CanShoot = true;
     }
 
+    // Wait until the cooldown finishes before stopping the build efffect and activating the turret
+    IEnumerator BuildTowerTimer()
+    {
+        yield return new WaitForSeconds(BuildTime);
+
+        m_BuildEffect.gameObject.SetActive(false);
+        m_MainTower.gameObject.SetActive(true);
+    }
+
     public void ResetAttackTarget()
     {
         m_AttackTarget = null;
-        m_MainTower.transform.rotation = m_OriginalFacing;
-
         FindNearestTarget();
     }
 

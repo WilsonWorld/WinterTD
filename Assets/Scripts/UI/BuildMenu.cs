@@ -6,12 +6,25 @@ public class BuildMenu : MonoBehaviour
 {
     [SerializeField] GameObject BasicTowerPrefab;
     [SerializeField] GameObject BlitzTowerPrefab;
+    [SerializeField] GameObject BlastTowerPrefab;
     Player m_playerRef;
 
     // Start is called before the first frame update
     void Start()
     {
         m_playerRef = GameObject.Find("Main Camera").GetComponent<Player>();
+    }
+
+    public void OnBlastTowerClick()
+    {
+        if (BlastTowerPrefab == null)
+            return;
+
+        if (m_playerRef.m_MoneyCounter < BlastTowerPrefab.GetComponent<Tower>().BuildCost)
+            return;
+
+        m_playerRef.SetTowerToBuild(BlastTowerPrefab);
+        m_playerRef.IsReadyToBuild = true;
     }
 
     public void OnBlitzTowerClick()

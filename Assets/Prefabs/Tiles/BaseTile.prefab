@@ -27,7 +27,7 @@ Transform:
   m_GameObject: {fileID: 4198037177703032709}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.001, y: 1.001, z: 1.001}
   m_Children: []
   m_Father: {fileID: 532878766019464964}
   m_RootOrder: 0
@@ -195,8 +195,8 @@ MonoBehaviour:
   IsBuildable: 1
   TileSize: 5
   m_Renderer: {fileID: 3314860556787240696}
-  m_BaseColor: {r: 1, g: 1, b: 1, a: 1}
-  m_OffsetColor: {r: 0, g: 0, b: 0, a: 1}
+  m_BaseColor: {r: 0.60784316, g: 1, b: 1, a: 1}
+  m_OffsetColor: {r: 0, g: 1, b: 1, a: 1}
   m_Highlight: {fileID: 4198037177703032709}
   m_BuildableColor: {r: 0, g: 1, b: 0, a: 1}
   m_NonBuildableColor: {r: 1, g: 0, b: 0, a: 1}

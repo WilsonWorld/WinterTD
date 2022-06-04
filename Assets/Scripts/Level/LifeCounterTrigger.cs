@@ -4,12 +4,10 @@ using UnityEngine;
 
 public class LifeCounterTrigger : MonoBehaviour
 {
-    LevelManager m_LevelManager;
     Player m_playerRef;
 
     void Start()
     {
-        m_LevelManager = GameObject.Find("LevelManager").GetComponent<LevelManager>();
         m_playerRef = Camera.main.GetComponent<Player>();
     }
 
@@ -29,13 +27,12 @@ public class LifeCounterTrigger : MonoBehaviour
             return;
 
         m_playerRef.m_LifeCounter--;
-        m_LevelManager.UpdateLifeCounter();
-        m_LevelManager.ReduceEnemyCounter();
+        LevelManager.Instance.UpdateLifeCounter();
+        LevelManager.Instance.ReduceEnemyCounter();
 
         if (m_playerRef.m_LifeCounter <= 0) {
-            m_LevelManager.IsGameOver = true;
             ClearEnemies();
-            m_LevelManager.OpenDefeatScreen();
+            LevelManager.Instance.OpenDefeatScreen();
         }
     }
 

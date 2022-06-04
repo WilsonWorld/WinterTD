@@ -14,7 +14,6 @@ public class Player : MonoBehaviour
 
     // Player variables
     [Header("Player")]
-    [SerializeField] ParticleSystem m_BuildEffect;
     public int m_MoneyCounter = 10;
     public int m_LifeCounter = 1;
 
@@ -25,9 +24,6 @@ public class Player : MonoBehaviour
     private void Awake()
     {
         m_LevelManager = GameObject.Find("LevelManager").GetComponent<LevelManager>();
-
-        if (m_BuildEffect)
-            m_BuildEffect.gameObject.SetActive(false);
     }
 
     void Update()
@@ -49,12 +45,11 @@ public class Player : MonoBehaviour
                     spawnPos = hit.transform.position + new Vector3(0, 2.5f, 0);
                 }
 
+                // Reduce the player's money for the build cost, spawn in a tower, and set the tile it's on to un-buildable/walkable
                 if (spawnPos != Vector3.zero && hit.collider.GetComponent<Tile>().IsBuildable == true) {
                     m_MoneyCounter -= m_TowerToBuild.GetComponent<Tower>().BuildCost;
                     m_LevelManager.UpdateMoneyCounter();
-                    StartCoroutine(BuildTowerTimer(spawnPos, m_TowerToBuild));
-                    m_BuildEffect.gameObject.SetActive(true);
-                    m_BuildEffect.gameObject.transform.position = spawnPos + new Vector3(0.0f, 2.5f, 0.0f);
+                    SpawnTower(spawnPos, m_TowerToBuild);
                     hit.collider.GetComponent<Tile>().IsBuildable = false;
                     hit.collider.GetComponent<Tile>().IsWalkable = false;
                 }
@@ -109,14 +104,6 @@ public class Player : MonoBehaviour
     void SpawnTower(Vector3 spawnPos, GameObject towerPrefab)
     {
         Instantiate(towerPrefab, spawnPos, Quaternion.identity);
-    }
-
-    IEnumerator BuildTowerTimer(Vector3 spawnPos, GameObject towerPrefab)
-    {
-        yield return new WaitForSeconds((float)m_TowerToBuild.GetComponent<Tower>().BuildTime);
-
-        m_BuildEffect.gameObject.SetActive(false);
-        SpawnTower(spawnPos, towerPrefab);
     }
 
     public void SetTowerToBuild(GameObject towerPrefab)

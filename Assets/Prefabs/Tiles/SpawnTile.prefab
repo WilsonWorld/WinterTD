@@ -63,7 +63,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: da5d4eba73c2a2c47a0964346605c862, type: 2}
+  - {fileID: 2100000, guid: 4857b132e6d19cc4f954f8ec7e860bde, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -133,11 +133,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SpawnDelayTime: 3
-  NumEnemiesToSpawn: 1
   m_Waypoints:
   - {fileID: 0}
-  m_LevelManager: {fileID: 0}
-  m_EnemyPrefab: {fileID: 798420317567320071, guid: 553ee19407ee4cb44b32a103b41d35ae, type: 3}
+  m_EnemyPrefabs:
+  - {fileID: 798420317567320071, guid: 553ee19407ee4cb44b32a103b41d35ae, type: 3}
+  - {fileID: 3010191273354435958, guid: 90a4ad7120ff37746ad321e6beedce5f, type: 3}
+  - {fileID: 5841598617293017056, guid: d663235204bcd8748b2cda6de995e93c, type: 3}
+  - {fileID: 7309561784137141057, guid: ef6e0cd6d32e67a4ebfa00050fa87948, type: 3}
+  - {fileID: 6080526328296843341, guid: 29c7990c1ae725e4cbaf01ee4f597c56, type: 3}
 --- !u!1 &5370568159639843222
 GameObject:
   m_ObjectHideFlags: 0
@@ -165,7 +168,7 @@ Transform:
   m_GameObject: {fileID: 5370568159639843222}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.001, y: 1.001, z: 1.001}
   m_Children: []
   m_Father: {fileID: 8624201633623185687}
   m_RootOrder: 0

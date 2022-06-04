@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 public class LevelManager : MonoBehaviour
 {
+    public static LevelManager Instance;
     public List<EnemySpawner> Spawners;
     public float PrepTime = 10.0f;
 
@@ -13,12 +14,20 @@ public class LevelManager : MonoBehaviour
     Player m_Player;
     GameObject m_HUD;
     GameObject m_DefeatScreen;
+    GameObject m_VictoryScreen;
 
     float m_PrepTimer = 0.0f;
     int m_WaveNum = 0;
     int m_EnemyNum = 0;
-    bool m_IsGameOver = false;
 
+
+    private void Awake()
+    {
+        if (Instance == null)
+            Instance = this;
+        else
+            Destroy(this);
+    }
 
     void Start()
     {
@@ -28,6 +37,7 @@ public class LevelManager : MonoBehaviour
         GameObject userInterfaces = GameObject.Find("User Interfaces");
         m_HUD = userInterfaces.transform.GetChild(0).gameObject;
         m_DefeatScreen = userInterfaces.transform.GetChild(1).gameObject;
+        m_VictoryScreen = userInterfaces.transform.GetChild(2).gameObject;
 
         // Set up the game
         PrepareNextWave();
@@ -54,18 +64,22 @@ public class LevelManager : MonoBehaviour
         int reward = 2;
         int rewardAmount = m_WaveNum;
         for (int i = 0; i < rewardAmount; i++) {
-            reward += Random.Range(1, 5);
+            reward += Random.Range(1, 4);
         }
 
         m_Player.m_MoneyCounter += reward;
         UpdateMoneyCounter();
-        PrepareNextWave();
+
+        if (m_WaveNum < 30)
+            PrepareNextWave();
+        else
+            OpenVictoryScreen();
     }
 
     // If the spawner is active then update the Wave Counter, reset the prep time/spawn timer to give the player time to prepare for the next wave
     void PrepareNextWave()
     {
-        if (Spawners == null || m_DisableSpawners == true || IsGameOver == true)
+        if (Spawners == null || m_DisableSpawners == true)
             return;
 
         m_WaveNum++;
@@ -73,6 +87,7 @@ public class LevelManager : MonoBehaviour
 
         foreach (var spawner in Spawners) {
             spawner.SpawnDelayTime = PrepTime;
+            spawner.InitPrefab(m_WaveNum);
             spawner.StartSpawnTimer();
             m_PrepTimer = PrepTime;
         }
@@ -99,12 +114,17 @@ public class LevelManager : MonoBehaviour
     // Decree the Enemy Counter and update the UI element for it. If no enemies remain, end the current wave and move onto the next.
     public void ReduceEnemyCounter()
     {
+        if (m_EnemyNum <= 0)
+            return;
+
         m_EnemyNum--;
-        UpdateEnemyCounter();
 
         if (m_EnemyNum <= 0) {
+            m_EnemyNum = 0;
             CompleteWave();
         }
+
+        UpdateEnemyCounter();
     }
 
     // Clear any remaining towers, reset game varialbles and the UI elements
@@ -112,14 +132,15 @@ public class LevelManager : MonoBehaviour
     {
         ClearTowers();
 
-        m_IsGameOver = false;
-        m_WaveNum = 1;
-        m_Player.m_MoneyCounter = 10;
-        m_Player.m_LifeCounter = 10;
+        m_WaveNum = 0;
+        m_Player.m_MoneyCounter = 15;
+        m_Player.m_LifeCounter = 20;
 
         UpdateWaveCounter();
         UpdateMoneyCounter();
         UpdateLifeCounter();
+
+        PrepareNextWave();
     }
 
     /* HUD Functions */
@@ -154,6 +175,8 @@ public class LevelManager : MonoBehaviour
         lifeCounter.GetComponent<Text>().text = "Lives " + m_Player.m_LifeCounter.ToString();
     }
 
+    /* UI Functions */
+
     public void OpenDefeatScreen()
     {
         m_HUD.SetActive(false);
@@ -170,14 +193,23 @@ public class LevelManager : MonoBehaviour
         Time.timeScale = 1;
     }
 
-    /* Variable Functions */
-
-    public bool IsGameOver
+    public void OpenVictoryScreen()
     {
-        get { return m_IsGameOver; }
-        set { m_IsGameOver = value; }
+        m_HUD.SetActive(false);
+        m_VictoryScreen.SetActive(true);
+
+        Time.timeScale = 0;
     }
 
+    public void CloseVictoryScreen()
+    {
+        m_HUD.SetActive(true);
+        m_VictoryScreen.SetActive(false);
+
+        Time.timeScale = 1;
+    }
+
+    /* Variable Functions */
     public int WaveNum
     {
         get { return m_WaveNum; }

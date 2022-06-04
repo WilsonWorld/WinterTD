@@ -3,31 +3,83 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
+public enum EnemyRank
+{
+    RANK_BRONZE,
+    RANK_SILVER,
+    RANK_GOLD,
+    RANK_MAX
+}
+
 public class Enemy : MonoBehaviour
 {
+    public List<Material> RankMaterials;
     public List<GameObject> Waypoints;
 
+    [SerializeField] EnemyRank m_Rank;
     [SerializeField] float m_StartingHealth = 5.0f;
     [SerializeField] int m_MoneyDropAmount = 1;
 
     LevelManager m_LevelManager;
     NavMeshAgent NavAgent;
-    float m_MaxHealth;
     float m_CurrentHealth;
     int m_CurrentWaypointIndex;
 
 
-    void Awake()
+    void Start()
     {
-        m_LevelManager = GameObject.Find("LevelManager").GetComponent<LevelManager>();
+        m_LevelManager = LevelManager.Instance;
         NavAgent = GetComponent<NavMeshAgent>();
         m_CurrentWaypointIndex = 0;
+        m_CurrentHealth = (m_StartingHealth + ((int)m_Rank * 5)) * m_LevelManager.WaveNum;
 
-        m_MaxHealth = m_StartingHealth * m_LevelManager.WaveNum;
-        m_CurrentHealth = m_MaxHealth;
+        InitMaterial();
 
-        if (NavAgent && Waypoints[0] != null) {
+        if (NavAgent && Waypoints[0] != null) 
             NavAgent.destination = Waypoints[CurrentWaypointIndex].transform.position;
+    }
+
+    // Setups up the enemy's visual appearence depending on their rank
+    void InitMaterial()
+    {
+        if (RankMaterials == null)
+            return;
+
+        switch (m_Rank)
+        {
+            case EnemyRank.RANK_BRONZE:
+                if (GetComponent<Renderer>())
+                    GetComponent<Renderer>().material = RankMaterials[0];
+
+                if (transform.GetChild(0).GetComponent<Renderer>())
+                    transform.GetChild(0).GetComponent<Renderer>().material = RankMaterials[0];
+
+                if (transform.GetChild(1).GetComponent<Renderer>())
+                    transform.GetChild(1).GetComponent<Renderer>().material = RankMaterials[0];
+                break;
+            case EnemyRank.RANK_SILVER:
+                if (GetComponent<Renderer>())
+                    GetComponent<Renderer>().material = RankMaterials[1];
+
+                if (transform.GetChild(0).GetComponent<Renderer>())
+                    transform.GetChild(0).GetComponent<Renderer>().material = RankMaterials[1];
+
+                if (transform.GetChild(1).GetComponent<Renderer>())
+                    transform.GetChild(1).GetComponent<Renderer>().material = RankMaterials[1];
+                break;
+            case EnemyRank.RANK_GOLD:
+                if (GetComponent<Renderer>())
+                    GetComponent<Renderer>().material = RankMaterials[2];
+
+                if (transform.GetChild(0).GetComponent<Renderer>())
+                    transform.GetChild(0).GetComponent<Renderer>().material = RankMaterials[2];
+
+                if (transform.GetChild(1).GetComponent<Renderer>())
+                    transform.GetChild(1).GetComponent<Renderer>().material = RankMaterials[2];
+                break;
+            case EnemyRank.RANK_MAX:
+                Debug.Log("Error. Rank doesn't exist.");
+                break;
         }
     }
 
@@ -80,6 +132,7 @@ public class Enemy : MonoBehaviour
             NavAgent.destination = Waypoints[CurrentWaypointIndex].transform.position;
     }
 
+    /* Variable Functions */
     public int CurrentWaypointIndex
     {
         get { return m_CurrentWaypointIndex; }
@@ -89,5 +142,11 @@ public class Enemy : MonoBehaviour
     public float CurrentHealth
     {
         get { return m_CurrentHealth; }
+    }
+
+    public EnemyRank Rank
+    {
+        get { return m_Rank; }
+        set { m_Rank = value; }
     }
 }
