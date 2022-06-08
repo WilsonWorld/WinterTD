@@ -6,6 +6,7 @@ public class Tower : MonoBehaviour
 {
     [SerializeField] protected ParticleSystem m_ProjectileBlastPrefab;
     [SerializeField] protected ParticleSystem m_BuildEffect;
+    [SerializeField] protected float m_StartingHealth = 5.0f;
     [SerializeField] protected float m_Cooldown = 5.0f;
     [SerializeField] protected float m_Range = 60.0f;
     [SerializeField] protected int m_DamageMin = 1;
@@ -16,6 +17,7 @@ public class Tower : MonoBehaviour
     protected GameObject m_AttackTarget;
     protected GameObject m_MainTower;
     protected Transform m_MuzzlePoint;
+    protected float m_CurrentHealth;
     protected bool m_CanShoot = true;
 
     Quaternion targetRotation = Quaternion.identity;
@@ -24,6 +26,7 @@ public class Tower : MonoBehaviour
 
     void Start()
     {
+        m_CurrentHealth = m_StartingHealth;
         m_MainTower = transform.GetChild(0).gameObject;
         m_MuzzlePoint = transform.GetChild(0).GetChild(0).GetChild(0);
         m_BuildEffect = transform.GetChild(2).GetComponent<ParticleSystem>();
@@ -135,12 +138,35 @@ public class Tower : MonoBehaviour
     }
 
     // Wait until the cooldown finishes before stopping the build efffect and activating the turret
-    IEnumerator BuildTowerTimer()
+    protected IEnumerator BuildTowerTimer()
     {
         yield return new WaitForSeconds(BuildTime);
 
         m_BuildEffect.gameObject.SetActive(false);
         m_MainTower.gameObject.SetActive(true);
+    }
+
+    // When an enemy dies increase the player's money, update the releveant UI elements, sets the tile back to buildable, and destroys the game object
+    protected void OnDeath()
+    {
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position, -transform.up, out hit, 3.0f)) {
+            Tile tile = hit.transform.gameObject.GetComponent<Tile>();
+
+            if (tile && !tile.IsSpawner) 
+                tile.IsBuildable = true;
+        }
+
+        Destroy(gameObject);
+    }
+
+    // When an enemy takes damange their current health is reduced. If reduced to 0 or less, the enemy dies.
+    public void TakeDamage(float damage)
+    {
+        m_CurrentHealth -= damage;
+
+        if (m_CurrentHealth <= 0.0f) 
+            OnDeath();
     }
 
     public void ResetAttackTarget()
@@ -165,5 +191,10 @@ public class Tower : MonoBehaviour
     {
         get { return m_BuildTime; }
         set { m_BuildTime = value; }
+    }
+
+    public float CurrentHealth
+    {
+        get { return m_CurrentHealth; }
     }
 }

@@ -14931,12 +14931,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_ProjectileBlastPrefab: {fileID: 1268662358822725183}
   m_BuildEffect: {fileID: 0}
-  m_Cooldown: 5
-  m_Range: 60
-  m_DamageMin: 1
-  m_DamageMax: 3
-  m_BuildCost: 5
-  m_BuildTime: 5
+  m_StartingHealth: 5
+  m_Cooldown: 4
+  m_Range: 22.5
+  m_DamageMin: 5
+  m_DamageMax: 9
+  m_BuildCost: 24
+  m_BuildTime: 12
 --- !u!1 &5885732181688048904
 GameObject:
   m_ObjectHideFlags: 0

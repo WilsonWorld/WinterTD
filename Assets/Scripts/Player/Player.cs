@@ -65,6 +65,11 @@ public class Player : MonoBehaviour
                 IsReadyToBuild = false;
             }
         }
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            m_LevelManager.OpenPauseMenu();
+        }
     }
 
     // Update the Camera's position based on received input

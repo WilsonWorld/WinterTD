@@ -111,8 +111,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   IsWalkable: 1
-  IsFlyable: 1
   IsBuildable: 0
+  IsSpawner: 1
   TileSize: 5
   m_Renderer: {fileID: 6830478245025388779}
   m_BaseColor: {r: 1, g: 1, b: 1, a: 0}

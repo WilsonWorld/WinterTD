@@ -15,6 +15,7 @@ public class LevelManager : MonoBehaviour
     GameObject m_HUD;
     GameObject m_DefeatScreen;
     GameObject m_VictoryScreen;
+    GameObject m_PauseMenu;
 
     float m_PrepTimer = 0.0f;
     int m_WaveNum = 0;
@@ -38,6 +39,7 @@ public class LevelManager : MonoBehaviour
         m_HUD = userInterfaces.transform.GetChild(0).gameObject;
         m_DefeatScreen = userInterfaces.transform.GetChild(1).gameObject;
         m_VictoryScreen = userInterfaces.transform.GetChild(2).gameObject;
+        m_PauseMenu = userInterfaces.transform.GetChild(3).gameObject;
 
         // Set up the game
         PrepareNextWave();
@@ -145,33 +147,36 @@ public class LevelManager : MonoBehaviour
 
     /* HUD Functions */
 
+    public void UpdatePrepTimer()
+    {
+        GameObject prepTimer = m_HUD.transform.GetChild(1).GetChild(0).gameObject;
+        if (m_PrepTimer > 0)
+            prepTimer.GetComponent<Text>().text = "Next Wave In " + m_PrepTimer.ToString("0");
+        else
+            prepTimer.GetComponent<Text>().text = "";
+    }
+
     public void UpdateWaveCounter()
     {
-        GameObject waveCounter = m_HUD.transform.GetChild(5).GetChild(0).gameObject;
+        GameObject waveCounter = m_HUD.transform.GetChild(2).GetChild(0).gameObject;
         waveCounter.GetComponent<Text>().text = "Wave " + m_WaveNum.ToString();
     }
 
     public void UpdateEnemyCounter()
     {
-        GameObject enemyCounter = m_HUD.transform.GetChild(4).GetChild(0).gameObject;
+        GameObject enemyCounter = m_HUD.transform.GetChild(3).GetChild(0).gameObject;
         enemyCounter.GetComponent<Text>().text = "Enemies " + m_EnemyNum.ToString();
-    }
-
-    public void UpdatePrepTimer()
-    {
-        GameObject prepTimer = m_HUD.transform.GetChild(3).GetChild(0).gameObject;
-        prepTimer.GetComponent<Text>().text = "Next Wave In " + m_PrepTimer.ToString("0");
     }
 
     public void UpdateMoneyCounter()
     {
-        GameObject moneyCounter = m_HUD.transform.GetChild(2).GetChild(0).gameObject;
+        GameObject moneyCounter = m_HUD.transform.GetChild(4).GetChild(0).gameObject;
         moneyCounter.GetComponent<Text>().text = "$ " + m_Player.m_MoneyCounter.ToString();
     }
 
     public void UpdateLifeCounter()
     {
-        GameObject lifeCounter = m_HUD.transform.GetChild(1).GetChild(0).gameObject;
+        GameObject lifeCounter = m_HUD.transform.GetChild(5).GetChild(0).gameObject;
         lifeCounter.GetComponent<Text>().text = "Lives " + m_Player.m_LifeCounter.ToString();
     }
 
@@ -181,7 +186,6 @@ public class LevelManager : MonoBehaviour
     {
         m_HUD.SetActive(false);
         m_DefeatScreen.SetActive(true);
-
         Time.timeScale = 0;
     }
 
@@ -189,7 +193,6 @@ public class LevelManager : MonoBehaviour
     {
         m_HUD.SetActive(true);
         m_DefeatScreen.SetActive(false);
-
         Time.timeScale = 1;
     }
 
@@ -197,7 +200,6 @@ public class LevelManager : MonoBehaviour
     {
         m_HUD.SetActive(false);
         m_VictoryScreen.SetActive(true);
-
         Time.timeScale = 0;
     }
 
@@ -205,8 +207,13 @@ public class LevelManager : MonoBehaviour
     {
         m_HUD.SetActive(true);
         m_VictoryScreen.SetActive(false);
-
         Time.timeScale = 1;
+    }
+
+    public void OpenPauseMenu()
+    {
+        m_PauseMenu.SetActive(true);
+        Time.timeScale = 0;
     }
 
     /* Variable Functions */

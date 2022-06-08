@@ -3,23 +3,37 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class MainMenu : MonoBehaviour
+public class PauseMenu : MonoBehaviour
 {
-    public string FirstLevel;
+    public string MainMenuLevel;
     public GameObject OptionsScreen;
     public AudioSource ButtonPressSFX;
 
-    float m_Delay = 0.25f;
+    float m_Delay = 0.2f;
 
     IEnumerator StartDelayTimer()
     {
         yield return new WaitForSeconds(m_Delay);
 
-        SceneManager.LoadScene(FirstLevel);
+        gameObject.SetActive(false);
     }
 
-    public void StartGame()
+    IEnumerator QuitDelayTimer()
     {
+        yield return new WaitForSeconds(m_Delay);
+
+        SceneManager.LoadScene(MainMenuLevel);
+    }
+
+    public void OpenPauseMenu()
+    {
+        Time.timeScale = 0;
+        gameObject.SetActive(true);
+    }
+
+    public void ContinueGame()
+    {
+        Time.timeScale = 1;
         StartCoroutine(StartDelayTimer());
     }
 
@@ -35,8 +49,8 @@ public class MainMenu : MonoBehaviour
 
     public void QuitGame()
     {
-        Application.Quit();
-        Debug.Log("Quitting");
+        Time.timeScale = 1;
+        StartCoroutine(QuitDelayTimer());
     }
 
     public void PlayButtonPressSFX()

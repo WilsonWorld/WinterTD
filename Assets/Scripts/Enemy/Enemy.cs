@@ -24,7 +24,7 @@ public class Enemy : MonoBehaviour
     NavMeshAgent NavAgent;
     float m_CurrentHealth;
     int m_CurrentWaypointIndex;
-
+    bool m_AttackTower = false;
 
     void Start()
     {
@@ -37,6 +37,36 @@ public class Enemy : MonoBehaviour
 
         if (NavAgent && Waypoints[0] != null) 
             NavAgent.destination = Waypoints[CurrentWaypointIndex].transform.position;
+    }
+
+    private void Update()
+    {
+        if (GetComponent<Rigidbody>().IsSleeping() == true && m_AttackTower == false)
+        {
+            m_AttackTower = true;
+            Tower nearTower = null;
+            float nearestTower = float.MaxValue;
+            Collider[] colliders = Physics.OverlapSphere(transform.position, 20.0f);
+
+            foreach (Collider towerObj in colliders)
+            {
+                Tower hitTower = towerObj.GetComponent<Tower>();
+
+                if (hitTower) {
+                    float dist = Vector3.Distance(this.transform.position, hitTower.transform.position);
+
+                    if (dist < nearestTower) {
+                        nearestTower = dist;
+                        nearTower = hitTower;
+                    }
+                }
+            }
+
+            if (nearTower) {
+                nearTower.TakeDamage(5.0f);
+                m_AttackTower = false;
+            }
+        }
     }
 
     // Setups up the enemy's visual appearence depending on their rank
@@ -97,7 +127,7 @@ public class Enemy : MonoBehaviour
         if (Physics.Raycast(transform.position, -transform.up, out hit, 3.0f)) {
 
             Tile tile = hit.transform.gameObject.GetComponent<Tile>();
-            if (tile) {
+            if (tile && !tile.IsSpawner) {
                 tile.IsBuildable = true;
             }
         }

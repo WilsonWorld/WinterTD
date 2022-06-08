@@ -732,12 +732,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_ProjectileBlastPrefab: {fileID: 3566623940547935693}
   m_BuildEffect: {fileID: 0}
-  m_Cooldown: 1.5
-  m_Range: 27.5
+  m_StartingHealth: 5
+  m_Cooldown: 2
+  m_Range: 22.5
   m_DamageMin: 2
-  m_DamageMax: 3
-  m_BuildCost: 10
-  m_BuildTime: 8
+  m_DamageMax: 4
+  m_BuildCost: 18
+  m_BuildTime: 9
   m_ProjectileBlastPrefab2: {fileID: 1229032282014368185}
 --- !u!1 &8163427563747870458
 GameObject:
@@ -1077,15 +1078,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6125321374197189224, guid: f5caf49d6d79a024b83c1c1d6763f300, type: 3}
       propertyPath: m_LocalScale.x
-      value: 33.333336
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 6125321374197189224, guid: f5caf49d6d79a024b83c1c1d6763f300, type: 3}
       propertyPath: m_LocalScale.y
-      value: 33.333336
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 6125321374197189224, guid: f5caf49d6d79a024b83c1c1d6763f300, type: 3}
       propertyPath: m_LocalScale.z
-      value: 33.333336
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 6125321374197189224, guid: f5caf49d6d79a024b83c1c1d6763f300, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1230,15 +1231,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6125321374197189224, guid: f5caf49d6d79a024b83c1c1d6763f300, type: 3}
       propertyPath: m_LocalScale.x
-      value: 33.333336
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 6125321374197189224, guid: f5caf49d6d79a024b83c1c1d6763f300, type: 3}
       propertyPath: m_LocalScale.y
-      value: 33.333336
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 6125321374197189224, guid: f5caf49d6d79a024b83c1c1d6763f300, type: 3}
       propertyPath: m_LocalScale.z
-      value: 33.333336
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 6125321374197189224, guid: f5caf49d6d79a024b83c1c1d6763f300, type: 3}
       propertyPath: m_LocalPosition.x
