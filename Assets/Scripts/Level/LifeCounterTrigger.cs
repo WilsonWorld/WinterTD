@@ -15,9 +15,8 @@ public class LifeCounterTrigger : MonoBehaviour
     {
         Enemy enemy = other.gameObject.GetComponent<Enemy>();
 
-        if (enemy) {
+        if (enemy) 
             StartCoroutine(DelayTimer(enemy));
-        }
     }
 
     // Dcrement the player's LifeCount and update the UI elements. If the LifeCounter is 0 or less, the game is over and the player has been defeated
@@ -40,6 +39,7 @@ public class LifeCounterTrigger : MonoBehaviour
     void ClearEnemies()
     {
         GameObject[] remainingEnemies = GameObject.FindGameObjectsWithTag("Enemy");
+
         if (remainingEnemies != null) {
             foreach (var enemy in remainingEnemies){
                 Destroy(enemy);
@@ -49,7 +49,7 @@ public class LifeCounterTrigger : MonoBehaviour
 
     IEnumerator DelayTimer(Enemy enemy)
     {
-        yield return new WaitForSeconds(2.0f);
+        yield return new WaitForSeconds(4.0f);
 
         if (enemy) {
             ReduceLifeCounter();

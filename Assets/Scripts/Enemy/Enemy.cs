@@ -15,6 +15,8 @@ public class Enemy : MonoBehaviour
 {
     public List<Material> RankMaterials;
     public List<GameObject> Waypoints;
+    public GameObject SelectionHighlight;
+    public Sprite ProfileSprite;
 
     [SerializeField] EnemyRank m_Rank;
     [SerializeField] float m_StartingHealth = 5.0f;
@@ -24,14 +26,17 @@ public class Enemy : MonoBehaviour
     NavMeshAgent NavAgent;
     float m_CurrentHealth;
     int m_CurrentWaypointIndex;
-    bool m_AttackTower = false;
+    bool m_IsDead = false;
+    bool m_IsAttacking = false;
 
     void Start()
     {
         m_LevelManager = LevelManager.Instance;
         NavAgent = GetComponent<NavMeshAgent>();
         m_CurrentWaypointIndex = 0;
-        m_CurrentHealth = (m_StartingHealth + ((int)m_Rank * 5)) * m_LevelManager.WaveNum;
+        m_StartingHealth = (m_StartingHealth + ((int)m_Rank * 5)) * m_LevelManager.WaveNum;
+        m_CurrentHealth = m_StartingHealth;
+        m_MoneyDropAmount += m_LevelManager.WaveNum;
 
         InitMaterial();
 
@@ -39,34 +44,14 @@ public class Enemy : MonoBehaviour
             NavAgent.destination = Waypoints[CurrentWaypointIndex].transform.position;
     }
 
+    // If the enemy's path is blocked, attack & destroy blocking tower to clear a path. Reset the attack once the enemy is moving again.
     private void Update()
     {
-        if (GetComponent<Rigidbody>().IsSleeping() == true && m_AttackTower == false)
-        {
-            m_AttackTower = true;
-            Tower nearTower = null;
-            float nearestTower = float.MaxValue;
-            Collider[] colliders = Physics.OverlapSphere(transform.position, 20.0f);
+        if (GetComponent<Rigidbody>().IsSleeping() == true && m_IsAttacking == false)
+            AttackTower();
 
-            foreach (Collider towerObj in colliders)
-            {
-                Tower hitTower = towerObj.GetComponent<Tower>();
-
-                if (hitTower) {
-                    float dist = Vector3.Distance(this.transform.position, hitTower.transform.position);
-
-                    if (dist < nearestTower) {
-                        nearestTower = dist;
-                        nearTower = hitTower;
-                    }
-                }
-            }
-
-            if (nearTower) {
-                nearTower.TakeDamage(5.0f);
-                m_AttackTower = false;
-            }
-        }
+        if (GetComponent<Rigidbody>().IsSleeping() == false && m_IsAttacking == true)
+            m_IsAttacking = false;
     }
 
     // Setups up the enemy's visual appearence depending on their rank
@@ -75,8 +60,7 @@ public class Enemy : MonoBehaviour
         if (RankMaterials == null)
             return;
 
-        switch (m_Rank)
-        {
+        switch (m_Rank) {
             case EnemyRank.RANK_BRONZE:
                 if (GetComponent<Renderer>())
                     GetComponent<Renderer>().material = RankMaterials[0];
@@ -113,34 +97,51 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    // When an enemy dies increase the player's money, update the releveant UI elements, sets the tile back to buildable, and destroys the game object
+    // Raycast infront of the enemy. If a tower is hit, damage/destroy the tower.
+    void AttackTower()
+    {
+        m_IsAttacking = true;
+        RaycastHit hit;
+        int layerMask = 1 << 6;
+
+        if (Physics.Raycast(transform.position, transform.forward, out hit, 12.5f, ~layerMask)) {
+            Debug.DrawRay(transform.position, transform.forward * 12.5f, Color.green, 1.0f);
+            Tower tower = hit.transform.parent.gameObject.GetComponent<Tower>();
+
+            if (tower && tower.CurrentHealth > 0.0f)
+                tower.TakeDamage(5.0f);
+        }
+    }
+
+    // Stop the life trigger timer if activated, reset the tile the enemy is on as buildable, reward + update player counters, and destroy the enemy object
     void OnDeath()
     {
+        m_IsDead = true;
+
         LifeCounterTrigger lct = Waypoints[0].GetComponent<LifeCounterTrigger>();
         lct.StopDelayTimer(this);
+
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position, -transform.up, out hit, 3.0f)) {
+            Tile tile = hit.transform.gameObject.GetComponent<Tile>();
+
+            if (tile && !tile.IsSpawner) 
+                tile.IsBuildable = true;
+        }
 
         m_LevelManager.PlayerRef.m_MoneyCounter += m_MoneyDropAmount;
         m_LevelManager.UpdateMoneyCounter();
         m_LevelManager.ReduceEnemyCounter();
 
-        RaycastHit hit;
-        if (Physics.Raycast(transform.position, -transform.up, out hit, 3.0f)) {
-
-            Tile tile = hit.transform.gameObject.GetComponent<Tile>();
-            if (tile && !tile.IsSpawner) {
-                tile.IsBuildable = true;
-            }
-        }
-
         Destroy(gameObject);
     }
 
-    // When an enemy takes damange their current health is reduced. If reduced to 0 or less, the enemy dies.
+    // When an enemy takes damange their current health is reduced. If reduced to 0 or less, the damaging tower has their attack target reset and the enemy dies.
     public void TakeDamage(float damage, Tower damagingTower)
     {
         m_CurrentHealth -= damage;
 
-        if (m_CurrentHealth <= 0.0f) {
+        if (m_IsDead == false && m_CurrentHealth <= 0.0f) {
             damagingTower.ResetAttackTarget();
             OnDeath();
         }
@@ -163,10 +164,21 @@ public class Enemy : MonoBehaviour
     }
 
     /* Variable Functions */
+    public EnemyRank Rank
+    {
+        get { return m_Rank; }
+        set { m_Rank = value; }
+    }
+
     public int CurrentWaypointIndex
     {
         get { return m_CurrentWaypointIndex; }
         set { m_CurrentWaypointIndex = value; }
+    }
+
+    public float StartingHealth
+    {
+        get { return m_StartingHealth; }
     }
 
     public float CurrentHealth
@@ -174,9 +186,4 @@ public class Enemy : MonoBehaviour
         get { return m_CurrentHealth; }
     }
 
-    public EnemyRank Rank
-    {
-        get { return m_Rank; }
-        set { m_Rank = value; }
-    }
 }

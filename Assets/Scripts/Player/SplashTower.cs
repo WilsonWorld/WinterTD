@@ -4,17 +4,6 @@ using UnityEngine;
 
 public class SplashTower : Tower
 {
-    protected override void AttackNearestTarget()
-    {
-        if (m_CanShoot == true)
-        {
-            m_CanShoot = false;
-            m_ProjectileBlastPrefab.Play();
-            SpawnRaycast();
-            StartCoroutine(CooldownTimer());
-        }
-    }
-
     protected override void SpawnRaycast()
     {
         RaycastHit hit;
@@ -26,13 +15,13 @@ public class SplashTower : Tower
 
             if (enemy) {
                 int damage = GenerateRandomDamange(m_DamageMin, m_DamageMax);
-                Collider[] colliders = Physics.OverlapSphere(enemy.transform.position, 30.0f);
+                Collider[] colliders = Physics.OverlapSphere(enemy.transform.position, 17.5f);
 
                 foreach (Collider enemyObj in colliders) {
                     Enemy hitEnemy = enemyObj.GetComponent<Enemy>();
 
                     if (hitEnemy && hitEnemy.CurrentHealth > 0.0f)
-                        enemy.TakeDamage(damage, this);
+                        StartCoroutine(DamageDelay(hitEnemy));
                 }
             }
         }

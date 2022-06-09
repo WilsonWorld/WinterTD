@@ -75,6 +75,14 @@ public class Tower : MonoBehaviour
         ResetAttackTarget();
     }
 
+    protected virtual IEnumerator DamageDelay(Enemy enemy)
+    {
+        yield return new WaitForSeconds(0.5f);
+
+        int damage = GenerateRandomDamange(m_DamageMin, m_DamageMax);
+        enemy.TakeDamage(damage, this);
+    }
+
     // Check for other colliders with a spherical radius, checking for the closest enemy to set as a target
     protected void FindNearestTarget()
     {
@@ -117,10 +125,8 @@ public class Tower : MonoBehaviour
             Debug.DrawRay(m_MuzzlePoint.transform.position, direction.normalized * m_Range, Color.red, 1.0f);
             Enemy enemy = hit.transform.gameObject.GetComponent<Enemy>();
 
-            if (enemy && enemy.CurrentHealth > 0.0f) {
-                int damage = GenerateRandomDamange(m_DamageMin, m_DamageMax);
-                enemy.TakeDamage(damage, this);
-            }
+            if (enemy && enemy.CurrentHealth > 0.0f)
+                StartCoroutine(DamageDelay(enemy));
         }
     }
 

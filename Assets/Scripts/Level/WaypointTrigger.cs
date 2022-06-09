@@ -9,9 +9,8 @@ public class WaypointTrigger : MonoBehaviour
     {
         Enemy enemy = other.gameObject.GetComponent<Enemy>();
 
-        if (enemy) {
+        if (enemy)
             StartCoroutine(NavUpdateTimer(enemy));
-        }
     }
 
     IEnumerator NavUpdateTimer(Enemy enemy)

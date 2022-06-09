@@ -20,8 +20,7 @@ public class EnemySpawner : MonoBehaviour
     void SpawnEnemy()
     {
         m_SpawnPrefab.GetComponent<Enemy>().Waypoints = m_Waypoints;
-
-        Vector3 spawnPoint = transform.position;;
+        Vector3 spawnPoint = transform.position;
         spawnPoint.y = transform.position.y + transform.lossyScale.y * 0.5f;
         Instantiate(m_SpawnPrefab, spawnPoint, transform.rotation);
 
@@ -44,8 +43,7 @@ public class EnemySpawner : MonoBehaviour
 
     public void InitPrefab(int cWave)
     {
-        switch (cWave)
-        {
+        switch (cWave) {
             case 1:
                 m_SpawnPrefab = m_EnemyPrefabs[0];      // Basic
                 m_SpawnPrefab.GetComponent<Enemy>().Rank = EnemyRank.RANK_BRONZE;

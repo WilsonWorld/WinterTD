@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class LevelManager : MonoBehaviour
 {
@@ -16,6 +17,8 @@ public class LevelManager : MonoBehaviour
     GameObject m_DefeatScreen;
     GameObject m_VictoryScreen;
     GameObject m_PauseMenu;
+
+    GameObject m_SelectedUnit;
 
     float m_PrepTimer = 0.0f;
     int m_WaveNum = 0;
@@ -57,6 +60,23 @@ public class LevelManager : MonoBehaviour
         if (m_PrepTimer > 0.0f) {
             m_PrepTimer -= Time.deltaTime;
             UpdatePrepTimer();
+        }
+
+        if (m_SelectedUnit == null)
+        {
+            CloseEnemyDisplay();
+            return;
+        }
+
+        Enemy selectedEnemy = m_SelectedUnit.GetComponent<Enemy>();
+        if (selectedEnemy) {
+            string healthText = selectedEnemy.CurrentHealth.ToString() + " / " + selectedEnemy.StartingHealth.ToString();
+            UpdateEnemyDisplay(selectedEnemy.ProfileSprite, healthText);
+
+            if (selectedEnemy.CurrentHealth <= 0) {
+                m_SelectedUnit = null;
+                CloseEnemyDisplay();
+            }
         }
     }
 
@@ -147,25 +167,25 @@ public class LevelManager : MonoBehaviour
 
     /* HUD Functions */
 
-    public void UpdatePrepTimer()
-    {
-        GameObject prepTimer = m_HUD.transform.GetChild(1).GetChild(0).gameObject;
-        if (m_PrepTimer > 0)
-            prepTimer.GetComponent<Text>().text = "Next Wave In " + m_PrepTimer.ToString("0");
-        else
-            prepTimer.GetComponent<Text>().text = "";
-    }
-
     public void UpdateWaveCounter()
     {
-        GameObject waveCounter = m_HUD.transform.GetChild(2).GetChild(0).gameObject;
+        GameObject waveCounter = m_HUD.transform.GetChild(1).GetChild(0).gameObject;
         waveCounter.GetComponent<Text>().text = "Wave " + m_WaveNum.ToString();
     }
 
     public void UpdateEnemyCounter()
     {
-        GameObject enemyCounter = m_HUD.transform.GetChild(3).GetChild(0).gameObject;
+        GameObject enemyCounter = m_HUD.transform.GetChild(2).GetChild(0).gameObject;
         enemyCounter.GetComponent<Text>().text = "Enemies " + m_EnemyNum.ToString();
+    }
+
+    public void UpdatePrepTimer()
+    {
+        GameObject prepTimer = m_HUD.transform.GetChild(3).GetChild(0).gameObject;
+        if (m_PrepTimer > 0)
+            prepTimer.GetComponent<Text>().text = "Next Wave In " + m_PrepTimer.ToString("0");
+        else
+            prepTimer.GetComponent<Text>().text = "";
     }
 
     public void UpdateMoneyCounter()
@@ -178,6 +198,22 @@ public class LevelManager : MonoBehaviour
     {
         GameObject lifeCounter = m_HUD.transform.GetChild(5).GetChild(0).gameObject;
         lifeCounter.GetComponent<Text>().text = "Lives " + m_Player.m_LifeCounter.ToString();
+    }
+
+    public void OpenEnemyDisplay()
+    {
+        m_HUD.transform.GetChild(6).gameObject.SetActive(true);
+    }
+
+    public void CloseEnemyDisplay()
+    {
+        m_HUD.transform.GetChild(6).gameObject.SetActive(false);
+    }
+
+    public void UpdateEnemyDisplay(Sprite image, string healthText )
+    {
+        m_HUD.transform.GetChild(6).GetChild(0).GetComponent<Image>().sprite = image;
+        m_HUD.transform.GetChild(6).GetChild(1).GetChild(0).GetComponent<TextMeshProUGUI>().text = healthText;
     }
 
     /* UI Functions */
@@ -227,5 +263,11 @@ public class LevelManager : MonoBehaviour
     {
         get { return m_Player; }
         private set { m_Player = value; }
+    }
+
+    public GameObject SelectedUnit
+    {
+        get { return m_SelectedUnit; }
+        set { m_SelectedUnit = value; }
     }
 }

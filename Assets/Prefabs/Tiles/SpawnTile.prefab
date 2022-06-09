@@ -63,7 +63,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 4857b132e6d19cc4f954f8ec7e860bde, type: 2}
+  - {fileID: 2100000, guid: 1eb9b6c65f4726346a9f918c3a07eab8, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -115,8 +115,6 @@ MonoBehaviour:
   IsSpawner: 1
   TileSize: 5
   m_Renderer: {fileID: 6830478245025388779}
-  m_BaseColor: {r: 1, g: 1, b: 1, a: 0}
-  m_OffsetColor: {r: 0, g: 0, b: 0, a: 0}
   m_Highlight: {fileID: 5370568159639843222}
   m_BuildableColor: {r: 0, g: 1, b: 0, a: 0}
   m_NonBuildableColor: {r: 1, g: 0, b: 0, a: 0}

@@ -15,6 +15,7 @@ public class GridManager : MonoBehaviour
         GenerateGrid();
     }
 
+    // Create a grid of tiles and initialize them.
     void GenerateGrid()
     {
         m_Tiles = new Dictionary<Vector3, Tile>();
@@ -26,21 +27,17 @@ public class GridManager : MonoBehaviour
                 spawnedTile.name = "Tile " + index.ToString();
                 spawnedTile.transform.SetParent(gameObject.transform);
 
-                var isOffset = (x % 2 == 0 && z % 2 != 0) || (x % 2 != 0 && z % 2 == 0);
-                spawnedTile.Init(isOffset);
-
                 m_Tiles[new Vector3(x * m_TilePrefab.TileSize, 2.5f, z * m_TilePrefab.TileSize)] = spawnedTile;
             }
         }
     }
 
+    // Return a grid's tile at the world pos specificed. 
     public Tile GetTileAtPos(Vector3 pos)
     {
-        if (m_Tiles.TryGetValue(pos, out var tile)) {
+        if (m_Tiles.TryGetValue(pos, out var tile))
             return tile;
-        }
-        else {
+        else 
             return null;
-        }
     }
 }

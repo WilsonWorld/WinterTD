@@ -273,11 +273,11 @@ MonoBehaviour:
   m_BuildEffect: {fileID: 0}
   m_StartingHealth: 5
   m_Cooldown: 3
-  m_Range: 17.5
+  m_Range: 15
   m_DamageMin: 1
-  m_DamageMax: 2
+  m_DamageMax: 3
   m_BuildCost: 8
-  m_BuildTime: 4
+  m_BuildTime: 5
 --- !u!1 &7203701091493850973
 GameObject:
   m_ObjectHideFlags: 0

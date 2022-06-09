@@ -30,6 +30,35 @@ public class Player : MonoBehaviour
     {
         UpdateCameraPosition();
 
+        if (m_IsReadyToBuild == false)
+        {
+            if (Input.GetMouseButtonDown(0))
+            {
+                if (LevelManager.Instance.SelectedUnit)
+                {
+                    LevelManager.Instance.SelectedUnit.GetComponent<Enemy>().SelectionHighlight.SetActive(false);
+                    LevelManager.Instance.CloseEnemyDisplay();
+                    LevelManager.Instance.SelectedUnit = null;
+                }
+
+                    RaycastHit hit;
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                int layer = 1 << 1;
+
+                Physics.Raycast(ray, out hit, 1000.0f, ~layer, QueryTriggerInteraction.Ignore);
+
+                if (hit.collider.gameObject.tag == "Enemy")
+                {
+                    Enemy hitEnemy = hit.collider.gameObject.GetComponent<Enemy>();
+                    hitEnemy.SelectionHighlight.SetActive(true);
+                    LevelManager.Instance.SelectedUnit = hitEnemy.gameObject;
+                    LevelManager.Instance.OpenEnemyDisplay();
+                    string healthText = hitEnemy.CurrentHealth.ToString() + " / " + hitEnemy.StartingHealth.ToString();
+                    LevelManager.Instance.UpdateEnemyDisplay(hitEnemy.ProfileSprite, healthText);
+                }
+            }
+        }
+
         // Check if a tower is trying to be built. Place building with left click, cancel with right click
         if (m_IsReadyToBuild == true && m_TowerToBuild != null) {
             // Raycast from the mouse position downward and find position in world to spawn tower
@@ -41,9 +70,8 @@ public class Player : MonoBehaviour
 
                 Physics.Raycast(ray, out hit, 1000.0f, ~layer, QueryTriggerInteraction.Ignore);
 
-                if (hit.collider.gameObject.tag == "Tile") {
+                if (hit.collider.gameObject.tag == "Tile")
                     spawnPos = hit.transform.position + new Vector3(0, 2.5f, 0);
-                }
 
                 // Reduce the player's money for the build cost, spawn in a tower, and set the tile it's on to un-buildable/walkable
                 if (spawnPos != Vector3.zero && hit.collider.GetComponent<Tile>().IsBuildable == true) {
@@ -67,9 +95,7 @@ public class Player : MonoBehaviour
         }
 
         if (Input.GetKeyDown(KeyCode.Escape))
-        {
             m_LevelManager.OpenPauseMenu();
-        }
     }
 
     // Update the Camera's position based on received input
@@ -77,21 +103,17 @@ public class Player : MonoBehaviour
     {
         Vector3 pos = transform.position;
 
-        if (Input.GetKey(KeyCode.W) || Input.mousePosition.y >= Screen.height - panBorderThickness) {
+        if (Input.GetKey(KeyCode.W) || Input.mousePosition.y >= Screen.height - panBorderThickness)
             pos.z += panSpeed * Time.deltaTime;
-        }
 
-        if (Input.GetKey(KeyCode.S) || Input.mousePosition.y <= panBorderThickness) {
+        if (Input.GetKey(KeyCode.S) || Input.mousePosition.y <= panBorderThickness)
             pos.z -= panSpeed * Time.deltaTime;
-        }
 
-        if (Input.GetKey(KeyCode.D) || Input.mousePosition.x >= Screen.width - panBorderThickness) {
+        if (Input.GetKey(KeyCode.D) || Input.mousePosition.x >= Screen.width - panBorderThickness)
             pos.x += panSpeed * Time.deltaTime;
-        }
 
-        if (Input.GetKey(KeyCode.A) || Input.mousePosition.x <= panBorderThickness) {
+        if (Input.GetKey(KeyCode.A) || Input.mousePosition.x <= panBorderThickness)
             pos.x -= panSpeed * Time.deltaTime;
-        }
 
         // Atler the zoom level of the camera based on scroll wheel input
         float scroll = Input.GetAxis("Mouse ScrollWheel");

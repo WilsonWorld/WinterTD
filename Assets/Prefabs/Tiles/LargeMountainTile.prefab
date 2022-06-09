@@ -143,7 +143,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 4857b132e6d19cc4f954f8ec7e860bde, type: 2}
+  - {fileID: 2100000, guid: 943fd52b029cc644a975474408af416e, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -191,8 +191,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   IsWalkable: 0
-  IsFlyable: 0
   IsBuildable: 0
+  IsSpawner: 0
   TileSize: 5
   m_Renderer: {fileID: 264137763029201326}
   m_BaseColor: {r: 1, g: 1, b: 1, a: 1}
