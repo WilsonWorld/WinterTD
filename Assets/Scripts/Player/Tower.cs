@@ -4,8 +4,11 @@ using UnityEngine;
 
 public class Tower : MonoBehaviour
 {
+    public Sprite ProfileSprite;
+
     [SerializeField] protected ParticleSystem m_ProjectileBlastPrefab;
     [SerializeField] protected ParticleSystem m_BuildEffect;
+    [SerializeField] protected GameObject m_SelectionHighlight;
     [SerializeField] protected float m_StartingHealth = 5.0f;
     [SerializeField] protected float m_Cooldown = 5.0f;
     [SerializeField] protected float m_Range = 60.0f;
@@ -29,7 +32,6 @@ public class Tower : MonoBehaviour
         m_CurrentHealth = m_StartingHealth;
         m_MainTower = transform.GetChild(0).gameObject;
         m_MuzzlePoint = transform.GetChild(0).GetChild(0).GetChild(0);
-        m_BuildEffect = transform.GetChild(2).GetComponent<ParticleSystem>();
 
         // Start with the turret deactivated, until the tower has been built
         m_MainTower.gameObject.SetActive(false);
@@ -166,6 +168,15 @@ public class Tower : MonoBehaviour
         Destroy(gameObject);
     }
 
+    public void SellTower()
+    {
+        int returnValue = (int)(m_BuildCost * 0.7f);
+        LevelManager.Instance.PlayerRef.m_MoneyCounter += returnValue;
+        LevelManager.Instance.UpdateMoneyCounter();
+
+        Destroy(gameObject);
+    }
+
     // When an enemy takes damange their current health is reduced. If reduced to 0 or less, the enemy dies.
     public void TakeDamage(float damage)
     {
@@ -198,9 +209,38 @@ public class Tower : MonoBehaviour
         get { return m_BuildTime; }
         set { m_BuildTime = value; }
     }
+    public GameObject SelectionHighlight
+    {
+        get { return m_SelectionHighlight; }
+    }
+
+    public float StartingHealth
+    {
+        get { return m_StartingHealth; }
+    }
 
     public float CurrentHealth
     {
         get { return m_CurrentHealth; }
+    }
+
+    public float Cooldown
+    {
+        get { return m_Cooldown; }
+    }
+
+    public float Range
+    {
+        get { return m_Range; }
+    }
+
+    public int DamageMin
+    {
+        get { return m_DamageMin; }
+    }
+
+    public int DamageMax
+    {
+        get { return m_DamageMax; }
     }
 }

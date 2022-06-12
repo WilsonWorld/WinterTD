@@ -20,12 +20,12 @@ public class Enemy : MonoBehaviour
 
     [SerializeField] EnemyRank m_Rank;
     [SerializeField] float m_StartingHealth = 5.0f;
-    [SerializeField] int m_MoneyDropAmount = 1;
 
     LevelManager m_LevelManager;
     NavMeshAgent NavAgent;
     float m_CurrentHealth;
-    int m_CurrentWaypointIndex;
+    int m_CurrentWaypointIndex = 0;
+    int m_MoneyDropAmount = 1;
     bool m_IsDead = false;
     bool m_IsAttacking = false;
 
@@ -36,8 +36,8 @@ public class Enemy : MonoBehaviour
         m_CurrentWaypointIndex = 0;
         m_StartingHealth = (m_StartingHealth + ((int)m_Rank * 5)) * m_LevelManager.WaveNum;
         m_CurrentHealth = m_StartingHealth;
-        m_MoneyDropAmount += m_LevelManager.WaveNum;
 
+        SetDropValue(m_LevelManager.WaveNum);
         InitMaterial();
 
         if (NavAgent && Waypoints[0] != null) 
@@ -47,11 +47,14 @@ public class Enemy : MonoBehaviour
     // If the enemy's path is blocked, attack & destroy blocking tower to clear a path. Reset the attack once the enemy is moving again.
     private void Update()
     {
-        if (GetComponent<Rigidbody>().IsSleeping() == true && m_IsAttacking == false)
-            AttackTower();
+        if (GetComponent<Rigidbody>().IsSleeping() == true && m_IsAttacking == false) {
+            StartCoroutine(AttackDelayTimer());
+        }
 
-        if (GetComponent<Rigidbody>().IsSleeping() == false && m_IsAttacking == true)
+        if (GetComponent<Rigidbody>().IsSleeping() == false && m_IsAttacking == true) {
             m_IsAttacking = false;
+            StopCoroutine(AttackDelayTimer());
+        }
     }
 
     // Setups up the enemy's visual appearence depending on their rank
@@ -60,41 +63,61 @@ public class Enemy : MonoBehaviour
         if (RankMaterials == null)
             return;
 
+        Renderer mainRenderer = GetComponent<Renderer>();
+        Renderer subRenderer1 = transform.GetChild(0).GetComponent<Renderer>();
+        Renderer subRenderer2 = transform.GetChild(1).GetComponent<Renderer>();
+
         switch (m_Rank) {
             case EnemyRank.RANK_BRONZE:
-                if (GetComponent<Renderer>())
-                    GetComponent<Renderer>().material = RankMaterials[0];
-
-                if (transform.GetChild(0).GetComponent<Renderer>())
-                    transform.GetChild(0).GetComponent<Renderer>().material = RankMaterials[0];
-
-                if (transform.GetChild(1).GetComponent<Renderer>())
-                    transform.GetChild(1).GetComponent<Renderer>().material = RankMaterials[0];
+                if (mainRenderer)
+                    mainRenderer.material = RankMaterials[0];
+                if (subRenderer1)
+                    subRenderer1.material = RankMaterials[0];
+                if (subRenderer2)
+                    subRenderer2.material = RankMaterials[0];
                 break;
+
             case EnemyRank.RANK_SILVER:
-                if (GetComponent<Renderer>())
-                    GetComponent<Renderer>().material = RankMaterials[1];
-
-                if (transform.GetChild(0).GetComponent<Renderer>())
-                    transform.GetChild(0).GetComponent<Renderer>().material = RankMaterials[1];
-
-                if (transform.GetChild(1).GetComponent<Renderer>())
-                    transform.GetChild(1).GetComponent<Renderer>().material = RankMaterials[1];
+                if (mainRenderer)
+                    mainRenderer.material = RankMaterials[1];
+                if (subRenderer1)
+                    subRenderer1.material = RankMaterials[1];
+                if (subRenderer2)
+                    subRenderer2.material = RankMaterials[1];
                 break;
+
             case EnemyRank.RANK_GOLD:
-                if (GetComponent<Renderer>())
-                    GetComponent<Renderer>().material = RankMaterials[2];
-
-                if (transform.GetChild(0).GetComponent<Renderer>())
-                    transform.GetChild(0).GetComponent<Renderer>().material = RankMaterials[2];
-
-                if (transform.GetChild(1).GetComponent<Renderer>())
-                    transform.GetChild(1).GetComponent<Renderer>().material = RankMaterials[2];
+                if (mainRenderer)
+                    mainRenderer.material = RankMaterials[2];
+                if (subRenderer1)
+                    subRenderer1.material = RankMaterials[2];
+                if (subRenderer2)
+                    subRenderer2.material = RankMaterials[2];
                 break;
+
             case EnemyRank.RANK_MAX:
                 Debug.Log("Error. Rank doesn't exist.");
                 break;
         }
+    }
+
+    // Assign the amount of money the enemy drops on death, depending on the current wave number
+    void SetDropValue(int waveNum)
+    {
+        int wave = waveNum;
+
+        if (wave >= 0 && wave < 5)
+            m_MoneyDropAmount = 1;
+        else if (wave >= 5 && wave < 10)
+            m_MoneyDropAmount = 2;
+        else if (wave >= 10 && wave < 15)
+            m_MoneyDropAmount = 3;
+        else if (wave >= 15 && wave < 20)
+            m_MoneyDropAmount = 4;
+        else if (wave >= 20 && wave < 25)
+            m_MoneyDropAmount = 5;
+        else
+            m_MoneyDropAmount = 6;
     }
 
     // Raycast infront of the enemy. If a tower is hit, damage/destroy the tower.
@@ -134,6 +157,13 @@ public class Enemy : MonoBehaviour
         m_LevelManager.ReduceEnemyCounter();
 
         Destroy(gameObject);
+    }
+
+    IEnumerator AttackDelayTimer()
+    {
+        yield return new WaitForSeconds(0.75f);
+
+        AttackTower();
     }
 
     // When an enemy takes damange their current health is reduced. If reduced to 0 or less, the damaging tower has their attack target reset and the enemy dies.

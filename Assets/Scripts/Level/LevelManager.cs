@@ -83,7 +83,7 @@ public class LevelManager : MonoBehaviour
     // When the player survives a wave increase their money, update the UI element for it, and call setup function for next wave.
     void CompleteWave()
     {
-        int reward = 2;
+        int reward = 5 + m_WaveNum;
         int rewardAmount = m_WaveNum;
         for (int i = 0; i < rewardAmount; i++) {
             reward += Random.Range(1, 4);
@@ -214,6 +214,29 @@ public class LevelManager : MonoBehaviour
     {
         m_HUD.transform.GetChild(6).GetChild(0).GetComponent<Image>().sprite = image;
         m_HUD.transform.GetChild(6).GetChild(1).GetChild(0).GetComponent<TextMeshProUGUI>().text = healthText;
+    }
+
+    public void OpenTowerDisplay()
+    {
+        m_HUD.transform.GetChild(7).gameObject.SetActive(true);
+    }
+
+    public void CloseTowerDisplay()
+    {
+        m_HUD.transform.GetChild(7).gameObject.SetActive(false);
+    }
+
+    public void UpdateTowerDisplay(Sprite image, string healthText, string damageText, string rangeText, string reloadText)
+    {
+        GameObject towerDisplay = m_HUD.transform.GetChild(7).gameObject;
+        GameObject towerStatsDisplay = towerDisplay.transform.GetChild(2).gameObject;
+
+        towerDisplay.transform.GetChild(0).GetComponent<Image>().sprite = image;
+        towerDisplay.transform.GetChild(1).GetChild(0).GetComponent<TextMeshProUGUI>().text = healthText;
+
+        towerStatsDisplay.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = damageText;
+        towerStatsDisplay.transform.GetChild(3).GetComponent<TextMeshProUGUI>().text = rangeText;
+        towerStatsDisplay.transform.GetChild(5).GetComponent<TextMeshProUGUI>().text = reloadText;
     }
 
     /* UI Functions */
