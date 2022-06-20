@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class SplashTower : Tower
 {
+    float m_overlapRadius = 7.5f;
+
+    // Override the base function to instead do a spherecast at the original raycast's impact point, damaging each enemy inside the sphere's radius
     protected override void SpawnRaycast()
     {
         RaycastHit hit;
@@ -15,7 +18,7 @@ public class SplashTower : Tower
 
             if (enemy) {
                 int damage = GenerateRandomDamange(m_DamageMin, m_DamageMax);
-                Collider[] colliders = Physics.OverlapSphere(enemy.transform.position, 17.5f);
+                Collider[] colliders = Physics.OverlapSphere(enemy.transform.position, m_overlapRadius);
 
                 foreach (Collider enemyObj in colliders) {
                     Enemy hitEnemy = enemyObj.GetComponent<Enemy>();

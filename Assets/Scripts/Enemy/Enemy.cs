@@ -13,11 +13,15 @@ public enum EnemyRank
 
 public class Enemy : MonoBehaviour
 {
+    [Header("Common Properties")]
     public List<Material> RankMaterials;
     public List<GameObject> Waypoints;
     public GameObject SelectionHighlight;
+    [SerializeField] ParticleSystem m_pfxSource;
+    [SerializeField] AudioSource m_sfxSource;
+    
+    [Header("Specific Properties")]
     public Sprite ProfileSprite;
-
     [SerializeField] EnemyRank m_Rank;
     [SerializeField] float m_StartingHealth = 5.0f;
 
@@ -34,7 +38,7 @@ public class Enemy : MonoBehaviour
         m_LevelManager = LevelManager.Instance;
         NavAgent = GetComponent<NavMeshAgent>();
         m_CurrentWaypointIndex = 0;
-        m_StartingHealth = (m_StartingHealth + ((int)m_Rank * 5)) * m_LevelManager.WaveNum;
+        m_StartingHealth = (m_StartingHealth + ((int)m_Rank * 15)) * m_LevelManager.WaveNum;
         m_CurrentHealth = m_StartingHealth;
 
         SetDropValue(m_LevelManager.WaveNum);
@@ -136,34 +140,68 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    // Stop the life trigger timer if activated, reset the tile the enemy is on as buildable, reward + update player counters, and destroy the enemy object
+    // Set the enemy as dead to prevent multiple deaths, disable the collider to prevent tower detection, stop the life counter incase it's activated, and set the speed to zero
     void OnDeath()
     {
         m_IsDead = true;
+        NavAgent.speed = 0;
+
+        Collider objCollider = GetComponent<Collider>();
+        objCollider.enabled = false;
 
         LifeCounterTrigger lct = Waypoints[0].GetComponent<LifeCounterTrigger>();
         lct.StopDelayTimer(this);
 
+        PlayDeathEffects();
+        ResetTile();
+        UpdateLevelManager();
+
+        StartCoroutine(DeathDelayTimer());
+    }
+
+    // Raycast to get the tile the enemy died on, and reset it to buildable
+    void ResetTile()
+    {
         RaycastHit hit;
         if (Physics.Raycast(transform.position, -transform.up, out hit, 3.0f)) {
             Tile tile = hit.transform.gameObject.GetComponent<Tile>();
 
-            if (tile && !tile.IsSpawner) 
+            if (tile && !tile.IsSpawner) {
                 tile.IsBuildable = true;
+                tile.UpdateHighlightColor();
+            }
         }
+    }
 
+    // Play particle and sound effects for dying
+    void PlayDeathEffects()
+    {
+        m_sfxSource.Play();
+        m_pfxSource.Play();
+    }
+
+    // Reward the player and update the UI counters
+    void UpdateLevelManager()
+    {
         m_LevelManager.PlayerRef.m_MoneyCounter += m_MoneyDropAmount;
         m_LevelManager.UpdateMoneyCounter();
         m_LevelManager.ReduceEnemyCounter();
-
-        Destroy(gameObject);
     }
 
+    // Delay attack to sync up damage with PFX
     IEnumerator AttackDelayTimer()
     {
         yield return new WaitForSeconds(0.75f);
 
         AttackTower();
+    }
+
+    // Delay Death to ensure FX plays correctly
+    IEnumerator DeathDelayTimer()
+    {
+        yield return new WaitForSeconds(0.2f);
+
+        Destroy(gameObject);
     }
 
     // When an enemy takes damange their current health is reduced. If reduced to 0 or less, the damaging tower has their attack target reset and the enemy dies.
@@ -214,6 +252,11 @@ public class Enemy : MonoBehaviour
     public float CurrentHealth
     {
         get { return m_CurrentHealth; }
+    }
+
+    public bool IsDead
+    {
+        get { return m_IsDead; }
     }
 
 }

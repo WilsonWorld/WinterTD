@@ -14,8 +14,7 @@ public class ReduceMovement : MonoBehaviour
         m_NavAgent = GetComponent<NavMeshAgent>();
         m_OriginalSpeed = m_NavAgent.speed;
         m_ReducedSpeed = m_OriginalSpeed * 0.5f;
-        m_Duration = 10.0f;
-
+        m_Duration = 8.0f;
         m_NavAgent.speed = m_ReducedSpeed;
 
         StartCoroutine(ResetSpeed());
@@ -27,7 +26,6 @@ public class ReduceMovement : MonoBehaviour
         yield return new WaitForSeconds(m_Duration);
 
         m_NavAgent.speed = m_OriginalSpeed;
-
         Destroy(this);
     }
 

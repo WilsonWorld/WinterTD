@@ -16,7 +16,7 @@ public class GridManager : MonoBehaviour
     }
 
     // Create a grid of tiles and initialize them.
-    void GenerateGrid()
+    public void GenerateGrid()
     {
         m_Tiles = new Dictionary<Vector3, Tile>();
 
@@ -30,6 +30,11 @@ public class GridManager : MonoBehaviour
                 m_Tiles[new Vector3(x * m_TilePrefab.TileSize, 2.5f, z * m_TilePrefab.TileSize)] = spawnedTile;
             }
         }
+    }
+
+    public void ClearGrid()
+    {
+        m_Tiles.Clear();
     }
 
     // Return a grid's tile at the world pos specificed. 

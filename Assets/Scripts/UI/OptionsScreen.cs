@@ -61,7 +61,8 @@ public class OptionsScreen : MonoBehaviour
         MusicLabel.text = Mathf.RoundToInt(MusicSlider.value + 80).ToString();
         SFXLabel.text = Mathf.RoundToInt(SFXSlider.value + 80).ToString();
     }
-
+    
+    // Move the user down through the list of resolutions when pressed
     public void ResLeft()
     {
         selectedResolution--;
@@ -72,6 +73,7 @@ public class OptionsScreen : MonoBehaviour
         UpdateResLabel();
     }
 
+    // Moves the user up through the list of resolutions when pressed
     public void ResRight()
     {
         selectedResolution++;
@@ -87,6 +89,7 @@ public class OptionsScreen : MonoBehaviour
         ResolutionLabel.text = Resolutions[selectedResolution].Horizontal.ToString() + " x " + Resolutions[selectedResolution].Vertical.ToString();
     }
 
+    // Apply the the changes made to the graphics when pressed
     public void ApplyGraphics()
     {
         if (VsyncToggle.isOn) 

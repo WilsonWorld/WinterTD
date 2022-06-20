@@ -41,6 +41,7 @@ public class EnemySpawner : MonoBehaviour
         StartCoroutine(SpawnTimer());
     }
 
+    // Set the prefab type and rank to spawn in depending on which wave number is active
     public void InitPrefab(int cWave)
     {
         switch (cWave) {

@@ -19,10 +19,10 @@ public class Player : MonoBehaviour
     public int m_LifeCounter = 1;
 
     [Header("Prefabs")]
-    [SerializeField] GameObject UBasicTowerPrefab;
-    [SerializeField] GameObject UBlitzTowerPrefab;
-    [SerializeField] GameObject UBlastTowerPrefab;
-    [SerializeField] GameObject USlowTowerPrefab;
+    [SerializeField] GameObject UBasicTowerPrefab = null;
+    [SerializeField] GameObject UBlitzTowerPrefab = null;
+    [SerializeField] GameObject UBlastTowerPrefab = null;
+    [SerializeField] GameObject USlowTowerPrefab = null;
 
     LevelManager m_LevelManager;
     GameObject m_TowerToBuild = null;
@@ -99,6 +99,42 @@ public class Player : MonoBehaviour
         transform.position = pos;
     }
 
+    // Create the display info for the Enemy Display UI with the specific enemy's data, activates the specifc enemy's highlight, and updates the HUD
+    void UpdateEnemyDisplayInfo(Enemy hitEnemy)
+    {
+        string healthText = hitEnemy.CurrentHealth.ToString() + " / " + hitEnemy.StartingHealth.ToString();
+        hitEnemy.SelectionHighlight.SetActive(true);
+
+        m_LevelManager.SelectedUnit = hitEnemy.gameObject;
+        m_LevelManager.OpenEnemyDisplay();
+        m_LevelManager.UpdateEnemyDisplay(hitEnemy.ProfileSprite, healthText);
+    }
+
+    // Create the display info for the Tower Display UI with the specific tower's data, activates the specifc tower's highlight, and updates the HUD
+    void UpdateTowerDisplayInfo(Tower hitTower)
+    {
+        string healthText = hitTower.CurrentHealth.ToString() + " / " + hitTower.StartingHealth.ToString();
+        string damageText = hitTower.DamageMin.ToString() + "-" + hitTower.DamageMax.ToString();
+        string rangeText = hitTower.Range.ToString() + "m";
+        string reloadText = hitTower.Cooldown.ToString() + "s";
+        string upgradeText = "$";
+
+        if (hitTower.GetComponent<FastTower>())
+            upgradeText = "$ " + UBlitzTowerPrefab.GetComponent<FastTower>().BuildCost.ToString();
+        else if (hitTower.GetComponent<SplashTower>())
+            upgradeText = "$ " + UBlastTowerPrefab.GetComponent<SplashTower>().BuildCost.ToString();
+        else if (hitTower.GetComponent<SlowingTower>())
+            upgradeText = "$ " + USlowTowerPrefab.GetComponent<SlowingTower>().BuildCost.ToString();
+        else
+            upgradeText = "$ " + UBasicTowerPrefab.GetComponent<Tower>().BuildCost.ToString();
+
+        hitTower.SelectionHighlight.SetActive(true);
+
+        m_LevelManager.SelectedUnit = hitTower.gameObject;
+        m_LevelManager.OpenTowerDisplay();
+        m_LevelManager.UpdateTowerDisplay(hitTower.ProfileSprite, healthText, damageText, rangeText, reloadText, upgradeText);
+    }
+
     // Handles the logic for activating the selection UI and visual object attached to the gameobject if the raycast hits that object.
     void SelectUnit()
     {
@@ -106,25 +142,12 @@ public class Player : MonoBehaviour
 
         if (hitObject.tag == "Enemy") {
             Enemy hitEnemy = hitObject.GetComponent<Enemy>();
-            string healthText = hitEnemy.CurrentHealth.ToString() + " / " + hitEnemy.StartingHealth.ToString();
-            hitEnemy.SelectionHighlight.SetActive(true);
-
-            m_LevelManager.SelectedUnit = hitEnemy.gameObject;
-            m_LevelManager.OpenEnemyDisplay();
-            m_LevelManager.UpdateEnemyDisplay(hitEnemy.ProfileSprite, healthText);
+            UpdateEnemyDisplayInfo(hitEnemy);
         }
 
         if (hitObject.tag == "Tower") {
             Tower hitTower = hitObject.transform.parent.gameObject.GetComponent<Tower>();
-            string healthText = hitTower.CurrentHealth.ToString() + " / " + hitTower.StartingHealth.ToString();
-            string damageText = hitTower.DamageMin.ToString() + "-" + hitTower.DamageMax.ToString();
-            string rangeText = hitTower.Range.ToString() + "m";
-            string reloadText = hitTower.Cooldown.ToString() + "s";
-            hitTower.SelectionHighlight.SetActive(true);
-
-            m_LevelManager.SelectedUnit = hitTower.gameObject;
-            m_LevelManager.OpenTowerDisplay();
-            m_LevelManager.UpdateTowerDisplay(hitTower.ProfileSprite, healthText, damageText, rangeText, reloadText);
+            UpdateTowerDisplayInfo(hitTower);
         }
     }
 
@@ -206,6 +229,9 @@ public class Player : MonoBehaviour
     {
         Tower selectedTower = m_LevelManager.SelectedUnit.GetComponent<Tower>();
         if (selectedTower == null)
+            return;
+
+        if (selectedTower.IsUpgraded)
             return;
 
         // Check if the selected tower can be stored in one of the tower sub types. If not, the upgrade is for a basic tower.

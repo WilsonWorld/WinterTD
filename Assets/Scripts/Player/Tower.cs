@@ -6,9 +6,13 @@ public class Tower : MonoBehaviour
 {
     public Sprite ProfileSprite;
 
+    [Header("Tower Components")]
+    [SerializeField] protected GameObject m_SelectionHighlight;
     [SerializeField] protected ParticleSystem m_ProjectileBlastPrefab;
     [SerializeField] protected ParticleSystem m_BuildEffect;
-    [SerializeField] protected GameObject m_SelectionHighlight;
+    [SerializeField] protected AudioClip m_BlastClip;
+    
+    [Header("Tower Properties")]
     [SerializeField] protected float m_StartingHealth = 5.0f;
     [SerializeField] protected float m_Cooldown = 5.0f;
     [SerializeField] protected float m_Range = 60.0f;
@@ -16,7 +20,9 @@ public class Tower : MonoBehaviour
     [SerializeField] protected int m_DamageMax = 3;
     [SerializeField] protected int m_BuildCost = 5;
     [SerializeField] protected int m_BuildTime = 5;
+    [SerializeField] protected bool m_IsUpgraded = false;
 
+    protected AudioSource m_sfxSource;
     protected GameObject m_AttackTarget;
     protected GameObject m_MainTower;
     protected Transform m_MuzzlePoint;
@@ -25,6 +31,7 @@ public class Tower : MonoBehaviour
 
     Quaternion targetRotation = Quaternion.identity;
     float turretRotSpeed = 90.0f;
+    bool m_IsBuilding = true;
 
 
     void Start()
@@ -32,6 +39,7 @@ public class Tower : MonoBehaviour
         m_CurrentHealth = m_StartingHealth;
         m_MainTower = transform.GetChild(0).gameObject;
         m_MuzzlePoint = transform.GetChild(0).GetChild(0).GetChild(0);
+        m_sfxSource = GetComponent<AudioSource>();
 
         // Start with the turret deactivated, until the tower has been built
         m_MainTower.gameObject.SetActive(false);
@@ -44,6 +52,9 @@ public class Tower : MonoBehaviour
     void Update()
     {
         if (m_MainTower == null)
+            return;
+
+        if (m_IsBuilding == true)
             return;
 
         // Face Towards the target if there is one
@@ -94,6 +105,9 @@ public class Tower : MonoBehaviour
 
         foreach (var collider in hitColliders) {
             if (collider.gameObject.tag == "Enemy") {
+                if (collider.gameObject.GetComponent<Enemy>().IsDead == true)
+                    break;
+
                 float distanceToCollider = Vector3.Distance(collider.transform.position, transform.position);
 
                 if (distanceToCollider < nearestCollider) {
@@ -111,6 +125,7 @@ public class Tower : MonoBehaviour
         if (m_CanShoot == true) {
             m_CanShoot = false;
             m_ProjectileBlastPrefab.Play();
+            m_sfxSource.PlayOneShot(m_BlastClip);
             SpawnRaycast();
             StartCoroutine(CooldownTimer());
         }
@@ -150,15 +165,19 @@ public class Tower : MonoBehaviour
     {
         yield return new WaitForSeconds(BuildTime);
 
+        m_IsBuilding = false;
+        m_sfxSource.Stop();
+
         m_BuildEffect.gameObject.SetActive(false);
         m_MainTower.gameObject.SetActive(true);
     }
 
-    // When an enemy dies increase the player's money, update the releveant UI elements, sets the tile back to buildable, and destroys the game object
+    // When a tower is destroyed or sold, make sure the tile under it is reset to buildable
     protected void OnDeath()
     {
         RaycastHit hit;
-        if (Physics.Raycast(transform.position, -transform.up, out hit, 3.0f)) {
+        int layerMask = 1 << 7;
+        if (Physics.Raycast(transform.GetChild(1).position, -transform.up, out hit, 5.0f, ~layerMask)) {
             Tile tile = hit.transform.gameObject.GetComponent<Tile>();
 
             if (tile && !tile.IsSpawner) 
@@ -168,13 +187,14 @@ public class Tower : MonoBehaviour
         Destroy(gameObject);
     }
 
+    // Calculate a percentage of the original build cost to return to the player's money counter
     public void SellTower()
     {
         int returnValue = (int)(m_BuildCost * 0.7f);
         LevelManager.Instance.PlayerRef.m_MoneyCounter += returnValue;
         LevelManager.Instance.UpdateMoneyCounter();
 
-        Destroy(gameObject);
+        OnDeath();
     }
 
     // When an enemy takes damange their current health is reduced. If reduced to 0 or less, the enemy dies.
@@ -186,12 +206,14 @@ public class Tower : MonoBehaviour
             OnDeath();
     }
 
+    // Set the target to null and look for the next target.
     public void ResetAttackTarget()
     {
         m_AttackTarget = null;
         FindNearestTarget();
     }
 
+    /* *** Public getters and setters for variables other classes need to access *** */
     public GameObject AttackTarget
     {
         get { return m_AttackTarget; }
@@ -242,5 +264,10 @@ public class Tower : MonoBehaviour
     public int DamageMax
     {
         get { return m_DamageMax; }
+    }
+
+    public bool IsUpgraded
+    {
+        get { return m_IsUpgraded; }
     }
 }

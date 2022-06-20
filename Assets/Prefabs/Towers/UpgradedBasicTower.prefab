@@ -10062,7 +10062,7 @@ Transform:
   m_GameObject: {fileID: 7288472811963205278}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0.75}
-  m_LocalScale: {x: 66.666664, y: 66.66667, z: 33.333332}
+  m_LocalScale: {x: 10, y: 10, z: 10}
   m_Children:
   - {fileID: 7955885343355594413}
   - {fileID: 6852681470499820556}
@@ -19870,6 +19870,7 @@ GameObject:
   - component: {fileID: 8139576982447837600}
   - component: {fileID: 8139576982447837604}
   - component: {fileID: 8139576982447837605}
+  - component: {fileID: 1298896661849401146}
   m_Layer: 7
   m_Name: UpgradedBasicTower
   m_TagString: Tower
@@ -19906,7 +19907,7 @@ SphereCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 5
+  m_Radius: 4
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!208 &8139576982447837604
 NavMeshObstacle:
@@ -19937,16 +19938,114 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ProfileSprite: {fileID: 21300000, guid: 8ffc7d9836a34694b917dfdfc95e9710, type: 3}
+  m_SelectionHighlight: {fileID: 8292508134615610852}
   m_ProjectileBlastPrefab: {fileID: 3513077838567812297}
   m_BuildEffect: {fileID: 9090534076888828947}
-  m_SelectionHighlight: {fileID: 8292508134615610852}
+  m_BlastClip: {fileID: 8300000, guid: f00db4e261f3ef240ba65d7f656b1cf3, type: 3}
   m_StartingHealth: 5
   m_Cooldown: 2.5
-  m_Range: 15
+  m_Range: 20
   m_DamageMin: 3
   m_DamageMax: 6
   m_BuildCost: 22
   m_BuildTime: 14
+  m_IsUpgraded: 1
+--- !u!82 &1298896661849401146
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8139576982447837603}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 8467932814877643511, guid: 186fa8a03291cdd41b2a733413bc883e, type: 2}
+  m_audioClip: {fileID: 8300000, guid: 4df4f7d7a1a05d94abec24fcdd7a2d20, type: 3}
+  m_PlayOnAwake: 1
+  m_Volume: 0.2
+  m_Pitch: 1
+  Loop: 1
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &8139576982723745790
 GameObject:
   m_ObjectHideFlags: 0

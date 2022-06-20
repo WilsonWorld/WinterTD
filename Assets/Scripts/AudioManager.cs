@@ -7,7 +7,7 @@ public class AudioManager : MonoBehaviour
 {
     public AudioMixer TheMixer;
 
-    // Start is called before the first frame update
+    // Set the initial values for the the sound if the player has changed the default values before
     void Start()
     {
         if (PlayerPrefs.HasKey("MasterVol")) {

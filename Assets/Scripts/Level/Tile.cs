@@ -27,12 +27,9 @@ public class Tile : MonoBehaviour
         if (m_PlayerRef == null || m_PlayerRef.IsReadyToBuild == false)
             return;
 
-        m_Highlight.SetActive(true);
+        UpdateHighlightColor();
 
-        if (IsBuildable == true)
-            m_Highlight.GetComponent<MeshRenderer>().material.color = m_BuildableColor;
-        else
-            m_Highlight.GetComponent<MeshRenderer>().material.color = m_NonBuildableColor;
+        m_Highlight.SetActive(true);
     }
 
     private void OnMouseExit()
@@ -44,7 +41,7 @@ public class Tile : MonoBehaviour
     {
         if (collision.gameObject.tag == "Enemy") {
             IsBuildable = false;
-            m_Highlight.GetComponent<MeshRenderer>().material.color = m_NonBuildableColor;
+            UpdateHighlightColor();
         }
     }
 
@@ -54,5 +51,17 @@ public class Tile : MonoBehaviour
             return;
 
         IsBuildable = true;
+    }
+
+    public void UpdateHighlightColor()
+    {
+        m_Highlight.SetActive(true);
+
+        if (IsBuildable == true)
+            m_Highlight.GetComponent<MeshRenderer>().material.color = m_BuildableColor;
+        else
+            m_Highlight.GetComponent<MeshRenderer>().material.color = m_NonBuildableColor;
+
+        m_Highlight.SetActive(false);
     }
 }

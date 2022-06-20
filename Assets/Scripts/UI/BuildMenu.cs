@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class BuildMenu : MonoBehaviour
 {
+    [SerializeField] AudioSource m_sfxSource;
     [SerializeField] GameObject BasicTowerPrefab;
     [SerializeField] GameObject BlitzTowerPrefab;
     [SerializeField] GameObject BlastTowerPrefab;
@@ -13,7 +14,7 @@ public class BuildMenu : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        m_playerRef = GameObject.Find("Main Camera").GetComponent<Player>();
+        m_playerRef = Camera.main.GetComponent<Player>();
     }
 
     public void OnSlowTowerClick()

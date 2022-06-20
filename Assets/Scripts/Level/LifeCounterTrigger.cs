@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class LifeCounterTrigger : MonoBehaviour
 {
+    [SerializeField] AudioSource m_sfxSource;
     Player m_playerRef;
 
     void Start()
@@ -24,6 +25,8 @@ public class LifeCounterTrigger : MonoBehaviour
     {
         if (m_playerRef == null)
             return;
+
+        m_sfxSource.Play();
 
         m_playerRef.m_LifeCounter--;
         LevelManager.Instance.UpdateLifeCounter();

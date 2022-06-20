@@ -7,18 +7,21 @@ using TMPro;
 public class LevelManager : MonoBehaviour
 {
     public static LevelManager Instance;
+    public GridManager m_GridManager;
+    [SerializeField] AudioSource m_sfxSource;
+    [SerializeField] AudioSource m_bgmSource;
+
+    [Header("Spawner Options")]
     public List<EnemySpawner> Spawners;
     public float PrepTime = 10.0f;
-
     [SerializeField] bool m_DisableSpawners = false;
 
     Player m_Player;
+    GameObject m_SelectedUnit;
     GameObject m_HUD;
     GameObject m_DefeatScreen;
     GameObject m_VictoryScreen;
     GameObject m_PauseMenu;
-
-    GameObject m_SelectedUnit;
 
     float m_PrepTimer = 0.0f;
     int m_WaveNum = 0;
@@ -44,7 +47,7 @@ public class LevelManager : MonoBehaviour
         m_VictoryScreen = userInterfaces.transform.GetChild(2).gameObject;
         m_PauseMenu = userInterfaces.transform.GetChild(3).gameObject;
 
-        // Set up the game
+        // Set up the first wave
         PrepareNextWave();
 
         // Active and update the HUD
@@ -62,8 +65,7 @@ public class LevelManager : MonoBehaviour
             UpdatePrepTimer();
         }
 
-        if (m_SelectedUnit == null)
-        {
+        if (m_SelectedUnit == null) {
             CloseEnemyDisplay();
             return;
         }
@@ -83,6 +85,8 @@ public class LevelManager : MonoBehaviour
     // When the player survives a wave increase their money, update the UI element for it, and call setup function for next wave.
     void CompleteWave()
     {
+        PlayWaveCompletionSFX();
+
         int reward = 5 + m_WaveNum;
         int rewardAmount = m_WaveNum;
         for (int i = 0; i < rewardAmount; i++) {
@@ -121,9 +125,37 @@ public class LevelManager : MonoBehaviour
         GameObject[] remainingTowers = GameObject.FindGameObjectsWithTag("Tower");
         if (remainingTowers != null) {
             foreach (var tower in remainingTowers) {
-                Destroy(tower);
+                Destroy(tower.gameObject);
             }
         }
+    }
+
+    // Find all the enemy objects in the level and remove them
+    void ClearEnemies()
+    {
+        GameObject[] remainingEnemies = GameObject.FindGameObjectsWithTag("Enemy");
+        if (remainingEnemies != null) {
+            foreach (var enemy in remainingEnemies) {
+                Destroy(enemy.gameObject);
+            }
+        }
+    }
+
+    // Play completion sfx and lower the bgm to prevent masking the sfx
+    void PlayWaveCompletionSFX()
+    {
+        m_sfxSource.Play();
+        m_bgmSource.volume = 0.1f;
+
+        StartCoroutine(sfxSourceDelay());
+    }
+
+    IEnumerator sfxSourceDelay()
+    {
+        float clipLength = m_sfxSource.clip.length - 1.0f;
+        yield return new WaitForSeconds(clipLength);
+
+        m_bgmSource.volume = 0.4f;
     }
 
     // Increase the Enemy Counter and update the UI element for it.
@@ -153,9 +185,12 @@ public class LevelManager : MonoBehaviour
     public void RestartLevel()
     {
         ClearTowers();
+        ClearEnemies();
+        m_GridManager.ClearGrid();
+        m_GridManager.GenerateGrid();
 
         m_WaveNum = 0;
-        m_Player.m_MoneyCounter = 15;
+        m_Player.m_MoneyCounter = 20;
         m_Player.m_LifeCounter = 20;
 
         UpdateWaveCounter();
@@ -226,7 +261,7 @@ public class LevelManager : MonoBehaviour
         m_HUD.transform.GetChild(7).gameObject.SetActive(false);
     }
 
-    public void UpdateTowerDisplay(Sprite image, string healthText, string damageText, string rangeText, string reloadText)
+    public void UpdateTowerDisplay(Sprite image, string healthText, string damageText, string rangeText, string reloadText, string upgradeText)
     {
         GameObject towerDisplay = m_HUD.transform.GetChild(7).gameObject;
         GameObject towerStatsDisplay = towerDisplay.transform.GetChild(2).gameObject;
@@ -237,6 +272,7 @@ public class LevelManager : MonoBehaviour
         towerStatsDisplay.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = damageText;
         towerStatsDisplay.transform.GetChild(3).GetComponent<TextMeshProUGUI>().text = rangeText;
         towerStatsDisplay.transform.GetChild(5).GetComponent<TextMeshProUGUI>().text = reloadText;
+        towerStatsDisplay.transform.GetChild(7).GetComponent<TextMeshProUGUI>().text = upgradeText;
     }
 
     /* UI Functions */
